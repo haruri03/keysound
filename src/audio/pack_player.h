@@ -31,6 +31,7 @@ class PackPlayer {
     thread worker;
     atomic<bool> stopping{false};
     atomic<unsigned long> readyGeneration{0};
+    atomic<int> volumePercent{100};
 
     bool cancelled(unsigned long generation) const {
         return stopping.load() || generation != packGeneration.load() || !packActive.load();
@@ -137,7 +138,8 @@ class PackPlayer {
                     droppedCount.fetch_add(1); continue;
                 }
                 const std::int64_t playStart = keysound::trace::now();
-                HRESULT hr = audio.play(path, event.interrupt ? Audio::PlayMode::interrupt : Audio::PlayMode::overlap);
+                HRESULT hr = audio.play(path, event.interrupt ? Audio::PlayMode::interrupt : Audio::PlayMode::overlap,
+                                        volumePercent.load() / 100.0f);
                 observe(audio);
                 if (keysound::trace::enabled()) keysound::trace::record(SUCCEEDED(hr) ? keysound::trace::Kind::PlayOk : keysound::trace::Kind::PlayFail, event.key.vkCode, static_cast<unsigned short>(event.key.flags), event.generation, playStart, keysound::trace::now());
                 if (keysound::trace::enabled()) keysound::trace::record(keysound::trace::Kind::Voices, event.key.vkCode, static_cast<unsigned short>(event.key.flags), event.generation, static_cast<std::int64_t>(audio.voice_count()), 0);
@@ -166,6 +168,10 @@ public:
     atomic<bool> loading{false}, readyState{false};
     atomic<HRESULT> lastError{S_OK};
     atomic<unsigned long long> playCount{0}, errorCount{0}, droppedCount{0}, enqueueCount{0};
+
+    void setVolumePercent(int percent) {
+        volumePercent.store(percent);
+    }
 
     void start() {
         lock_guard<mutex> lock(queueMutex);

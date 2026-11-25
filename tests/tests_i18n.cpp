@@ -23,7 +23,7 @@ int main()
     settings::Settings value;
     value.language = 2;
     const std::string text = settings::detail::serialize(value);
-    assert(text.compare(0, 19, "keysound-settings:2") == 0);
+    assert(text.compare(0, 19, "keysound-settings:3") == 0);
     assert(text.find("\nlang=2\n") != std::string::npos);
 
     settings::Settings parsed;

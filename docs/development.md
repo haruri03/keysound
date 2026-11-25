@@ -26,7 +26,7 @@
 
 Startup: `main` → `packPlayer.start()` → create the `keyboardReady` event → `thread key_hook` installs the hooks → wait until the hooks are ready → `SetIco()` creates the window and runs the message loop. On exit: `PostThreadMessage(keyboardThreadId, WM_QUIT)` → wait for the hook thread → `packPlayer.shutdown()`.
 
-Key press: the hook thread only decides and posts. `LowLevelKeyboardProc` filters auto-repeat with a "scan code + extended bit" table, so one physical press posts exactly once, then calls `packPlayer.submit`. `LowLevelMouseProc` submits left/right/middle releases the same way when `flag_mouse` is set.
+Key press: the hook thread only decides and posts. `LowLevelKeyboardProc` filters auto-repeat with a "scan code + extended bit" table, so one physical press posts exactly once, then calls `packPlayer.submit`. `LowLevelMouseProc` submits left, right, and middle button presses when `flag_mouse` is set.
 
 Sound packs: `submit` enqueues with `try_to_lock`; when the queue is full the event is dropped and counted. The worker validates each event against the generation and drops events older than 100 ms. Warm-up runs reset → snapshot `activePack` under `packMutex` → resolve the path for the mode → `initialize` → `preload` (with a cancellation callback) → set `readyState` only after everything succeeds. Key presses during warm-up are dropped outright, never replayed.
 

@@ -1,4 +1,11 @@
 # Changelog
+
+## Mouse press sounds and volume (2026-11-25)
+
+Left, right, and middle mouse buttons now trigger their mapped sounds on press. The tray and fallback sound menus offer a Volume submenu with 0% to 100% in 10% increments. The selection applies to new keyboard and mouse sounds and is saved across restarts. Older settings files load at 100%.
+
+The MSVC build and six regression executables passed. The existing sound pack test stopped at the legacy MCI open call. Desktop tray and audible playback verification are pending.
+
 Source: the user-approved directory reorganization plan and development verification; date: 2026-11-10.
 
 ## Directory reorganization

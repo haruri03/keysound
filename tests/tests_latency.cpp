@@ -17,6 +17,7 @@ static std::atomic<int> played{0}, resets{0};
 static std::atomic<bool> blockDecode{false}, decoding{false};
 static std::mutex playedMutex;
 static std::wstring playedPath;
+static std::atomic<float> playedVolume{0.0f};
 
 namespace {
 
@@ -29,8 +30,9 @@ public:
         decoding = false;
         return (cancel && cancel()) ? E_ABORT : S_OK;
     }
-    HRESULT play(const std::wstring& path, PlayMode) override {
+    HRESULT play(const std::wstring& path, PlayMode, float volume) override {
         { std::lock_guard<std::mutex> lock(playedMutex); playedPath = path; }
+        playedVolume = volume;
         ++played; return S_OK;
     }
     HRESULT reset() override { ++resets; return S_OK; }
@@ -68,6 +70,7 @@ int main() {
     assert(played == 0);
     LowLevelKeyboardProc(HC_ACTION, WM_KEYDOWN, reinterpret_cast<LPARAM>(&key));
     assert(waitFor([] { return played == 1; }));
+    assert(playedVolume == 1.0f);
     for (int i = 0; i < 100; ++i)
         LowLevelKeyboardProc(HC_ACTION, WM_SYSKEYDOWN, reinterpret_cast<LPARAM>(&key));
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -98,9 +101,11 @@ int main() {
     }
     packPlayer.prewarm();
     assert(waitFor([] { return packPlayer.readyState.load(); }));
+    packPlayer.setVolumePercent(50);
     LowLevelKeyboardProc(HC_ACTION, WM_KEYUP, reinterpret_cast<LPARAM>(&key));
     LowLevelKeyboardProc(HC_ACTION, WM_KEYDOWN, reinterpret_cast<LPARAM>(&key));
     assert(waitFor([] { return played == 3; }));
+    assert(playedVolume == 0.5f);
     { std::lock_guard<std::mutex> lock(playedMutex); assert(playedPath == L"assigned.wav"); }
     key.vkCode = 'B'; key.scanCode = 0x30;
     LowLevelKeyboardProc(HC_ACTION, WM_KEYDOWN, reinterpret_cast<LPARAM>(&key));
@@ -108,13 +113,29 @@ int main() {
     { std::lock_guard<std::mutex> lock(playedMutex); assert(playedPath == L"fallback.wav"); }
     flag_mouse = true;
     MSLLHOOKSTRUCT mouse{};
+    const auto beforeMouse = packPlayer.enqueueCount.load();
     LowLevelMouseProc(HC_ACTION, WM_LBUTTONUP, reinterpret_cast<LPARAM>(&mouse));
+    assert(packPlayer.enqueueCount == beforeMouse);
+    LowLevelMouseProc(HC_ACTION, WM_LBUTTONDOWN, reinterpret_cast<LPARAM>(&mouse));
     assert(waitFor([] { return played == 5; }));
+    assert(playedVolume == 0.5f);
     { std::lock_guard<std::mutex> lock(playedMutex); assert(playedPath == L"mouse.wav"); }
-    LowLevelMouseProc(HC_ACTION, WM_RBUTTONUP, reinterpret_cast<LPARAM>(&mouse));
+    LowLevelMouseProc(HC_ACTION, WM_LBUTTONUP, reinterpret_cast<LPARAM>(&mouse));
+    assert(packPlayer.enqueueCount == beforeMouse + 1);
+    flag_mouse = false;
+    LowLevelMouseProc(HC_ACTION, WM_LBUTTONDOWN, reinterpret_cast<LPARAM>(&mouse));
+    LowLevelMouseProc(HC_ACTION, WM_LBUTTONUP, reinterpret_cast<LPARAM>(&mouse));
+    assert(packPlayer.enqueueCount == beforeMouse + 1);
+    flag_mouse = true;
+    packPlayer.setVolumePercent(0);
+    LowLevelMouseProc(HC_ACTION, WM_LBUTTONDOWN, reinterpret_cast<LPARAM>(&mouse));
+    assert(waitFor([] { return played == 6; }));
+    assert(playedVolume == 0.0f);
+    LowLevelMouseProc(HC_ACTION, WM_LBUTTONUP, reinterpret_cast<LPARAM>(&mouse));
+    LowLevelMouseProc(HC_ACTION, WM_RBUTTONDOWN, reinterpret_cast<LPARAM>(&mouse));
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    assert(played == 5);
+    assert(played == 6);
     packPlayer.shutdown();
-    assert(played == 5 && packPlayer.cachedBytes == 0);
+    assert(played == 6 && packPlayer.cachedBytes == 0);
     return 0;
 }

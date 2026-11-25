@@ -63,10 +63,10 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 LRESULT CALLBACK LowLevelMouseProc(INT nCode, WPARAM wParam, LPARAM lParam)
 {
     if (nCode == HC_ACTION && lParam && flag_mouse.load() &&
-        (wParam == WM_LBUTTONUP || wParam == WM_RBUTTONUP || wParam == WM_MBUTTONUP))
+        (wParam == WM_LBUTTONDOWN || wParam == WM_RBUTTONDOWN || wParam == WM_MBUTTONDOWN))
     {
         KBDLLHOOKSTRUCT button{};
-        button.vkCode = wParam == WM_LBUTTONUP ? VK_LBUTTON : wParam == WM_RBUTTONUP ? VK_RBUTTON : VK_MBUTTON;
+        button.vkCode = wParam == WM_LBUTTONDOWN ? VK_LBUTTON : wParam == WM_RBUTTONDOWN ? VK_RBUTTON : VK_MBUTTON;
         packPlayer.submit(button, flag_fast.load(), true);
     }
     return CallNextHookEx(NULL, nCode, wParam, lParam);

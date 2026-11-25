@@ -22,3 +22,4 @@
 #define IDR_YIN 37
 
 #define IDR_LANG_BASE 40
+#define IDR_VOLUME_BASE 50

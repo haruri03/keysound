@@ -1,15 +1,21 @@
 #pragma once
 #include <windows.h>
+#include <charconv>
 #include <string>
+#include <system_error>
 #include <vector>
 
 namespace settings {
+inline constexpr int volume_step = 10;
+inline constexpr int max_volume = 100;
+
 struct Settings {
     bool use_pack = false;
     std::wstring pack_path;
     bool interrupt = false;
     bool mouse = true;
     int language = 0;
+    int volume = max_volume;
 };
 enum class LoadResult { Loaded, Missing, Invalid, IoError };
 enum class SaveResult { Saved, Invalid, Protected, IoError };
@@ -17,6 +23,7 @@ enum class SaveResult { Saved, Invalid, Protected, IoError };
 namespace detail {
 inline bool valid(const Settings& s) {
     return s.language >= 0 && s.language <= 2 &&
+        s.volume >= 0 && s.volume <= max_volume && s.volume % volume_step == 0 &&
         (!s.use_pack || !s.pack_path.empty()) &&
         s.pack_path.size() <= 16384 && s.pack_path.find(L'\0') == std::wstring::npos;
 }
@@ -41,27 +48,36 @@ inline bool decode(const std::string& s, std::wstring& out) {
     return true;
 }
 inline std::string serialize(const Settings& s) {
-    return std::string("keysound-settings:2\nmode=1\npack=") + (s.use_pack ? "1" : "0") +
+    return std::string("keysound-settings:3\nmode=1\npack=") + (s.use_pack ? "1" : "0") +
         "\npath=" + encode(s.pack_path) + "\ninterrupt=" + (s.interrupt ? "1" : "0") + "\nmouse=" + (s.mouse ? "1" : "0") +
-        "\nlang=" + std::to_string(s.language) + "\n";
+        "\nlang=" + std::to_string(s.language) + "\nvolume=" + std::to_string(s.volume) + "\n";
 }
 inline bool parse(const std::string& text, Settings& s) {
     std::vector<std::string> lines; size_t p=0;
     while(p<text.size()) {size_t e=text.find('\n',p); if(e==std::string::npos)return false; lines.push_back(text.substr(p,e-p)); p=e+1;}
     const bool v1 = lines.size()==6 && lines[0]=="keysound-settings:1";
     const bool v2 = lines.size()==7 && lines[0]=="keysound-settings:2";
-    if(!v1 && !v2) return false;
+    const bool v3 = lines.size()==8 && lines[0]=="keysound-settings:3";
+    if(!v1 && !v2 && !v3) return false;
     if(lines[1].compare(0,5,"mode=") || lines[2].compare(0,5,"pack=") || lines[3].compare(0,5,"path=") ||
        lines[4].compare(0,10,"interrupt=") || lines[5].compare(0,6,"mouse=")) return false;
     std::string mode=lines[1].substr(5), pack=lines[2].substr(5), fast=lines[4].substr(10), mouse=lines[5].substr(6);
     if(mode.empty() || mode.size()>2 || mode[0]<'1' || mode[0]>'9' || (mode.size()==2 && (mode[1]<'0'||mode[1]>'9')))return false;
     if((pack!="0"&&pack!="1")||(fast!="0"&&fast!="1")||(mouse!="0"&&mouse!="1"))return false;
     s.use_pack=pack=="1"; s.interrupt=fast=="1"; s.mouse=mouse=="1"; s.language=0;
-    if(v2) {
+    if(v2 || v3) {
         if(lines[6].compare(0,5,"lang=")) return false;
         const std::string lang=lines[6].substr(5);
         if(lang.size()!=1 || lang[0]<'0' || lang[0]>'2') return false;
         s.language=lang[0]-'0';
+    }
+    s.volume = max_volume;
+    if(v3) {
+        const std::string& field = lines[7];
+        if(field.compare(0, 7, "volume=")) return false;
+        const char* end = field.data() + field.size();
+        const auto result = std::from_chars(field.data() + 7, end, s.volume);
+        if(result.ec != std::errc{} || result.ptr != end) return false;
     }
     return decode(lines[3].substr(5),s.pack_path) && valid(s);
 }

@@ -15,11 +15,11 @@ public:
         return audio_.preload(paths, cancel);
     }
 
-    HRESULT play(const std::wstring& path, PlayMode mode) override {
+    HRESULT play(const std::wstring& path, PlayMode mode, float volume) override {
         const MemoryAudio::PlayMode target = (mode == PlayMode::interrupt)
             ? MemoryAudio::PlayMode::interrupt
             : MemoryAudio::PlayMode::overlap;
-        return audio_.play(path, target);
+        return audio_.play(path, target, volume);
     }
 
     HRESULT reset() override { return audio_.reset(); }

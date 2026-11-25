@@ -35,6 +35,7 @@ HMENU hmenu;
 HMENU packMenu;
 static HMENU languageMenu;
 static settings::Settings savedSettings;
+static constexpr int volumeOptions = settings::max_volume / settings::volume_step + 1;
 static wstring settingsPath() { return runPathW() + L"\\keysound-settings.dat"; }
 
 bool trayAvailable = false;
@@ -70,6 +71,7 @@ static void loadSettings()
     settings::load(settingsPath(), savedSettings);
     flag_fast = savedSettings.interrupt;
     flag_mouse = savedSettings.mouse;
+    packPlayer.setVolumePercent(savedSettings.volume);
     if (availablePacks.empty()) return;
     size_t chosen = 0;
     if (savedSettings.use_pack)
@@ -132,6 +134,16 @@ static void buildMenu(HWND hwnd)
                 i18n::pick(lang, L"音效打断", L"Interrupt sounds"));
     AppendMenuW(hmenu, MF_STRING | (flag_mouse.load() ? MF_CHECKED : MF_UNCHECKED), IDR_MOUSE,
                 i18n::pick(lang, L"鼠标音效", L"Mouse sounds"));
+    HMENU volumeMenu = CreatePopupMenu();
+    for (int i = 0; i < volumeOptions; ++i)
+    {
+        const int percent = i * settings::volume_step;
+        const std::wstring label = std::to_wstring(percent) + L"%";
+        AppendMenuW(volumeMenu, MF_STRING, IDR_VOLUME_BASE + i, label.c_str());
+    }
+    CheckMenuRadioItem(volumeMenu, IDR_VOLUME_BASE, IDR_VOLUME_BASE + volumeOptions - 1,
+                       IDR_VOLUME_BASE + savedSettings.volume / settings::volume_step, MF_BYCOMMAND);
+    AppendMenuW(hmenu, MF_POPUP, (UINT_PTR)volumeMenu, i18n::pick(lang, L"音量", L"Volume"));
     AppendMenuW(hmenu, MF_STRING, IDR_OPENDIR, i18n::pick(lang, L"打开目录", L"Open folder"));
     AppendMenuW(hmenu, MF_STRING, IDR_QUIT, i18n::pick(lang, L"退出", L"Exit"));
 }
@@ -367,6 +379,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 flag_mouse = !flag_mouse.load();
                 changed = true;
+            }
+            else if (xx >= IDR_VOLUME_BASE && xx < IDR_VOLUME_BASE + volumeOptions)
+            {
+                const int percent = (xx - IDR_VOLUME_BASE) * settings::volume_step;
+                if (percent != savedSettings.volume)
+                {
+                    savedSettings.volume = percent;
+                    packPlayer.setVolumePercent(percent);
+                    changed = true;
+                }
             }
             else if (xx == IDR_OPENDIR)
             {
