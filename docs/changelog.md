@@ -37,7 +37,7 @@ The built-in mode menu is now generated dynamically from `builtinModes()` and di
 
 ## Documentation layering
 Testing confirmed that the host does load nested `AGENTS.md` files layer by layer (subdirectory rules are injected automatically when entering src/, tests/, and tools/); the "layered loading unconfirmed" conclusion in the "Directory reorganization" section is void.
-The root `AGENTS.md` keeps only the 10 hard rules and the routing table; `src/AGENTS.md`, `tests/AGENTS.md`, and `tools/AGENTS.md` were added; `_docs/development.md` gained module layering, data flow, and failure modes.
+The root `AGENTS.md` keeps only the 10 hard rules and the routing table; `src/AGENTS.md`, `tests/AGENTS.md`, and `tools/AGENTS.md` were added; `docs/development.md` gained module layering, data flow, and failure modes.
 
 ## Comment cleanup
 After rule 9 of the root `AGENTS.md` became "write no comments in code", comments in `src/` and `tests/` were removed as well, 289 lines in total.

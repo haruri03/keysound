@@ -15,7 +15,7 @@ Closing the window keeps the program running in the tray. Use **Exit** in the me
 
 ## Sound packs
 
-Put a folder under `sounds\` with an `index.json` and an audio subfolder, and it shows up in the **Sound packs** menu on the next start. The full guide — file layout, every `index.json` field, the three playback modes, size limits and troubleshooting — is in [the sound pack guide](_docs/sound-packs.md).
+Put a folder under `sounds\` with an `index.json` and an audio subfolder, and it shows up in the **Sound packs** menu on the next start. The full guide — file layout, every `index.json` field, the three playback modes, size limits and troubleshooting — is in [the sound pack guide](docs/sound-packs.md).
 
 ## Settings
 

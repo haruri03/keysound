@@ -12,7 +12,7 @@ Product acceptance is confirmed by the user only; a feature without that confirm
 5. Distinguish compilation, simulated tests, and real desktop verification; the first two are not evidence of background playback or a working tray.
 6. Stop on a permission denial; do not bypass it by changing shells, elevating, or switching to desktop input.
 7. Build intermediates and test binaries go to `build/`; the release program goes to the repository root so it keeps resolving `sounds/` relatively.
-8. Do not modify `_archive/`; new development touches only `src/`, `tests/`, `tools/`, and `_docs/`.
+8. Do not modify `_archive/`; new development touches only `src/`, `tests/`, `tools/`, and `docs/`.
 9. Write no comments in code. The ability to read code is more reliable than comments: comments go stale and lie. Express intent through naming, structure, and module boundaries.
 10. Every new build unit must be added to `build/build-app.sh`, `build/build-tests.sh`, `tools/build-keysound.bat`, and `tools/test-keysound.bat` at the same time, or linking will fail with missing symbols.
 
@@ -28,9 +28,9 @@ The host loads nested `AGENTS.md` files layer by layer (verified: subdirectory r
 | `sounds/` | Runtime sounds and packs (runtime data, not source) | Not needed |
 | `build/` | Generated output; never the only copy of source or user resources | Not needed |
 | `_archive/` | Original deliverables; not a build input | Not needed |
-| `_docs/` | Process, verification records, change history | [_docs/development.md](_docs/development.md) |
+| `docs/` | Process, verification records, change history | [docs/development.md](docs/development.md) |
 
-Module and data-flow details, including failure modes, are in [_docs/development.md](_docs/development.md); build arguments are in [_docs/build.md](_docs/build.md); the test matrix is in [_docs/verification.md](_docs/verification.md); dates and migration records are in [_docs/changelog.md](_docs/changelog.md).
+Module and data-flow details, including failure modes, are in [docs/development.md](docs/development.md); build arguments are in [docs/build.md](docs/build.md); the test matrix is in [docs/verification.md](docs/verification.md); dates and migration records are in [docs/changelog.md](docs/changelog.md).
 
 ## Common commands
 
@@ -43,4 +43,4 @@ Both call `call "...\vcvars64.bat"` to enter the MSVC environment. Invoking a ba
 
 ## Documentation responsibilities
 
-README covers installation and usage only. Process lives in `_docs/`; change and verification records live in [_docs/changelog.md](_docs/changelog.md). The root file keeps only global hard rules and the routing table; directory details sink into child `AGENTS.md` files and `_docs/`.
+README covers installation and usage only. Process lives in `docs/`; change and verification records live in [docs/changelog.md](docs/changelog.md). The root file keeps only global hard rules and the routing table; directory details sink into child `AGENTS.md` files and `docs/`.

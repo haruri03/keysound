@@ -15,7 +15,7 @@ Windows 平台的键盘音效程序。每次按键都能发出声音——可以
 
 ## 音效包
 
-在 `sounds\` 下放一个文件夹，里面写上 `index.json` 和音频子目录，下次启动就会出现在 **Sound packs** 菜单里。完整教程——目录结构、`index.json` 每个字段、三种播放模式、体积上限和排错——见[音效包教程](_docs/sound-packs_cn.md)。
+在 `sounds\` 下放一个文件夹，里面写上 `index.json` 和音频子目录，下次启动就会出现在 **Sound packs** 菜单里。完整教程——目录结构、`index.json` 每个字段、三种播放模式、体积上限和排错——见[音效包教程](docs/sound-packs_cn.md)。
 
 ## 设置
 
