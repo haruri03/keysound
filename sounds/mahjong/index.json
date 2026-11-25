@@ -1,0 +1,10 @@
+{
+  "name": "mahjong",
+  "mode": "mixed",
+  "assigned_sounds": [
+    { "key": "Mouse Left", "sound": "output.wav" },
+    { "key": "Mouse Right", "sound": "output.wav" },
+    { "key": "Mouse Middle", "sound": "output.wav" }
+  ],
+  "soundsList": ["output.wav", "output1.wav", "output2.wav", "output3.wav"]
+}

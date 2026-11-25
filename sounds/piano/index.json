@@ -1,0 +1,10 @@
+{
+  "name": "piano",
+  "mode": "mixed",
+  "assigned_sounds": [
+    {"key":"0","sound":"0.wav"}, {"key":"1","sound":"1.wav"}, {"key":"2","sound":"2.wav"}, {"key":"3","sound":"3.wav"}, {"key":"4","sound":"4.wav"}, {"key":"5","sound":"5.wav"}, {"key":"6","sound":"6.wav"}, {"key":"7","sound":"7.wav"}, {"key":"8","sound":"8.wav"}, {"key":"9","sound":"9.wav"},
+    {"key":"A","sound":"A.wav"}, {"key":"B","sound":"B.wav"}, {"key":"C","sound":"C.wav"}, {"key":"D","sound":"D.wav"}, {"key":"E","sound":"E.wav"}, {"key":"F","sound":"F.wav"}, {"key":"G","sound":"G.wav"}, {"key":"H","sound":"H.wav"}, {"key":"I","sound":"I.wav"}, {"key":"J","sound":"J.wav"}, {"key":"K","sound":"K.wav"}, {"key":"L","sound":"L.wav"}, {"key":"M","sound":"M.wav"}, {"key":"N","sound":"N.wav"}, {"key":"O","sound":"O.wav"}, {"key":"P","sound":"P.wav"}, {"key":"Q","sound":"Q.wav"}, {"key":"R","sound":"R.wav"}, {"key":"S","sound":"S.wav"}, {"key":"T","sound":"T.wav"}, {"key":"U","sound":"U.wav"}, {"key":"V","sound":"V.wav"}, {"key":"W","sound":"W.wav"}, {"key":"X","sound":"X.wav"}, {"key":"Y","sound":"Y.wav"}, {"key":"Z","sound":"Z.wav"},
+    {"key":"Enter","sound":"Enter.wav"}
+  ],
+  "soundsList": ["default.wav"]
+}
